@@ -18,7 +18,7 @@ export default Ember.Service.extend({
     init () {
         this._super(...arguments);
 
-        this.keycloak = new Keycloak();
+        this.keycloak = new Keycloak('/keycloak.json');
     },
     loadUserProfile () {
         return new Ember.RSVP.Promise((resolve, reject) => {
