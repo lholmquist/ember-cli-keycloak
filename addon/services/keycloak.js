@@ -8,6 +8,7 @@ export default Ember.Service.extend({
     // Function to setup Keycloak and init it
     keycloakInit (options) {
         this.keycloak = new Keycloak(options);
+
         return new Ember.RSVP.Promise((resolve, reject) => {
             this.keycloak.init().success(() => {
                 resolve(this.keycloak);
@@ -38,6 +39,19 @@ export default Ember.Service.extend({
             // They are not loggged in after init, so do the login
             this.keycloak.login();
             return reject();
+        });
+    },
+    checkTransitionToRoute (transition) {
+        return new Ember.RSVP.Promise((resolve, reject) => {
+            this.keycloak.updateToken(5).success((refreshed) => {
+                console.log('refreshed', refreshed);
+                return resolve(refreshed);
+            }).error(() => {
+                console.log('update token failed');
+                reject();
+                transition.abort();
+                this.keycloak.login();
+            });
         });
     }
 });
